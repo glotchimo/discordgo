@@ -350,9 +350,9 @@ var (
 			}
 			format := "- %s %s\n"
 
-			channels := ""
-			users := ""
-			roles := ""
+			var channels strings.Builder
+			var users strings.Builder
+			var roles strings.Builder
 
 			for _, o := range perms.Permissions {
 				emoji := "❌"
@@ -362,20 +362,20 @@ var (
 
 				switch o.Type {
 				case discordgo.ApplicationCommandPermissionTypeUser:
-					users += fmt.Sprintf(format, emoji, "<@!"+o.ID+">")
+					users.WriteString(fmt.Sprintf(format, emoji, "<@!"+o.ID+">"))
 				case discordgo.ApplicationCommandPermissionTypeChannel:
 					allChannels, _ := discordgo.GuildAllChannelsID(i.GuildID)
 
 					if o.ID == allChannels {
-						channels += fmt.Sprintf(format, emoji, "All channels")
+						channels.WriteString(fmt.Sprintf(format, emoji, "All channels"))
 					} else {
-						channels += fmt.Sprintf(format, emoji, "<#"+o.ID+">")
+						channels.WriteString(fmt.Sprintf(format, emoji, "<#"+o.ID+">"))
 					}
 				case discordgo.ApplicationCommandPermissionTypeRole:
 					if o.ID == i.GuildID {
-						roles += fmt.Sprintf(format, emoji, "@everyone")
+						roles.WriteString(fmt.Sprintf(format, emoji, "@everyone"))
 					} else {
-						roles += fmt.Sprintf(format, emoji, "<@&"+o.ID+">")
+						roles.WriteString(fmt.Sprintf(format, emoji, "<@&"+o.ID+">"))
 					}
 				}
 			}
@@ -390,15 +390,15 @@ var (
 							Fields: []*discordgo.MessageEmbedField{
 								{
 									Name:  "Users",
-									Value: users,
+									Value: users.String(),
 								},
 								{
 									Name:  "Channels",
-									Value: channels,
+									Value: channels.String(),
 								},
 								{
 									Name:  "Roles",
-									Value: roles,
+									Value: roles.String(),
 								},
 							},
 						},

@@ -633,12 +633,12 @@ func (v *VoiceConnection) udpOpen() (err error) {
 	}
 
 	// Loop over position 8 through 71 to grab the IP address.
-	var ip string
+	var ip strings.Builder
 	for i := 8; i < len(rb)-2; i++ {
 		if rb[i] == 0 {
 			break
 		}
-		ip += string(rb[i])
+		ip.WriteString(string(rb[i]))
 	}
 
 	// Grab port from position 72 and 73
@@ -646,7 +646,7 @@ func (v *VoiceConnection) udpOpen() (err error) {
 
 	// Take the data from above and send it back to Discord to finalize
 	// the UDP connection handshake.
-	data := voiceUDPOp{1, voiceUDPD{"udp", voiceUDPData{ip, port, "xsalsa20_poly1305"}}}
+	data := voiceUDPOp{1, voiceUDPD{"udp", voiceUDPData{ip.String(), port, "xsalsa20_poly1305"}}}
 
 	v.wsMutex.Lock()
 	err = v.wsConn.WriteJSON(data)
